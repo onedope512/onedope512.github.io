@@ -13,6 +13,35 @@ function splitIntoSentences(text){
     .filter(Boolean);
 }
 
+// Keep the flight dash compact on phones while preserving the desktop links.
+(function mobileDash(){
+  const toggle = document.getElementById('navToggle');
+  const nav = document.getElementById('topnav');
+  if(!toggle || !nav) return;
+  const close = () => {
+    nav.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+  toggle.addEventListener('click', () => {
+    const open = !nav.classList.contains('is-open');
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  nav.addEventListener('click', event => {
+    if(event.target.closest('a')) close();
+  });
+  document.addEventListener('keydown', event => {
+    if(event.key === 'Escape' && nav.classList.contains('is-open')){
+      close();
+      toggle.focus();
+    }
+  });
+  document.addEventListener('pointerdown', event => {
+    if(nav.classList.contains('is-open') && !event.target.closest('.topbar-inner')) close();
+  });
+  window.matchMedia('(min-width: 901px)').addEventListener('change', close);
+})();
+
 // ---------------------------------------------------------------
 // Compass tick marks (drawn once, cheap to generate than to hand-write)
 // ---------------------------------------------------------------
