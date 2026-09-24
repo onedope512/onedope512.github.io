@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikhil Adapala — Flight Plan</title>
+<meta name="description" content="Nikhil Adapala — Aerospace Engineering & Mathematics, UT Austin. Software, robotics, and flight.">
+<meta name="theme-color" content="#6FA8C9">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nikhil Adapala — Flight Plan">
+<meta property="og:description" content="Aerospace Engineering & Mathematics at UT Austin. Student pilot. Builds space engines, robotic hands, and gravity simulators.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nikhil Adapala — Flight Plan">
+<meta name="twitter:description" content="Aerospace Engineering & Mathematics at UT Austin. Student pilot. Builds space engines, robotic hands, and gravity simulators.">
+<meta name="twitter:image" content="og-image.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="page-transition.css">
+<script src="page-transition.js" defer></script>
+<script>
+try{
+  const root = document.documentElement;
+  const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+  root.dataset.sky = hour < 6 || hour >= 20 ? 'night' : hour < 8 ? 'dawn' : hour >= 18 ? 'dusk' : 'day';
+  const override = sessionStorage.getItem('themeOverride');
+  if(override === 'day') root.classList.add('force-day');
+  else if(override === 'night' || (!override && localStorage.getItem('night') === '1')) root.classList.add('night');
+}catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="chart-texture" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="tag">N. ADAPALA</span>
+    <nav class="topnav">
+      <a href="#log">Log</a>
+      <a href="#builds">Builds</a>
+      <a href="#terminal">Terminal</a>
+      <a href="#ratings">Ratings</a>
+      <a href="#panel">Panel</a>
+      <a href="#briefing">Briefing</a>
+      <a href="#pattern">Land it</a>
+      <a href="#destination">Contact</a>
+      <a href="resume.html" data-page-transition>Résumé</a>
+    </nav>
+  </div>
+  <div class="route-bar" aria-hidden="true">
+    <div class="route-bar-fill" id="routeBarFill">
+      <img class="route-bar-plane" src="plane-icon.png" alt="">
+    </div>
+  </div>
+</header>
+
+<nav class="route-rail" id="routeRail" aria-label="Flight progress">
+  <div class="route-track"><div class="route-progress" id="routeProgress"></div></div>
+  <div class="route-dots" id="routeDots"></div>
+  <img class="route-plane" id="routePlane" src="plane-icon.png" alt="">
+</nav>
+
+<div class="squawk-banner" id="squawkBanner" role="alert" hidden>
+  <p class="squawk-text" id="squawkText"></p>
+  <span class="light-gun" id="lightGun" aria-hidden="true"></span>
+  <div class="squawk-actions" id="squawkActions"></div>
+</div>
+<div class="emergency-frame" aria-hidden="true"></div>
+
+<main>
+
+  <!-- ============ HERO : FLIGHT PLAN ============ -->
+  <section class="hero" id="top">
+    <div class="sky" aria-hidden="true">
+      <div class="stars"></div>
+      <div class="rain"></div>
+      <img class="cloud cloud-a" src="clouds/cloud-2.png" alt="">
+      <img class="cloud cloud-b" src="clouds/cloud-4.png" alt="">
+      <img class="cloud cloud-c" src="clouds/cloud-6.png" alt="">
+      <a class="plane" id="heroPlane" tabindex="-1" href="https://linkedin.com/in/nikhiladapala" target="_blank" rel="noopener" aria-label="Nikhil on LinkedIn" title="Fly to LinkedIn">
+        <img class="plane-img" src="plane-icon.png" alt="">
+      </a>
+    </div>
+    <div class="hero-inner">
+      <div class="plan-card">
+        <div class="plan-head">
+          <span>FLIGHT PLAN</span>
+          <span class="plan-head-sub">FORM 7233-1 · VFR</span>
+        </div>
+        <div class="plan-grid">
+          <div class="plan-field">
+            <span class="field-label">Pilot</span>
+            <span class="field-value">Nikhil Adapala</span>
+          </div>
+          <div class="plan-field">
+            <span class="field-label">Aircraft type</span>
+            <span class="field-value">B.S. Aerospace Engineering + B.S. Mathematics</span>
+          </div>
+          <div class="plan-field">
+            <span class="field-label">Departure point</span>
+            <span class="field-value">Austin, Texas</span>
+          </div>
+          <div class="plan-field">
+            <span class="field-label">Route</span>
+            <span class="field-value">software &#8594; robotics &#8594; flight</span>
+          </div>
+          <div class="plan-field">
+            <span class="field-label">Remarks</span>
+            <span class="field-value">Student pilot, en route to a Private Pilot's License.</span>
+          </div>
+          <div class="plan-field">
+            <span class="field-label">Weather, live</span>
+            <span class="field-value">
+              <span class="metar" id="metarLine">Fetching KAUS weather&hellip;</span>
+              <span class="metar-plain" id="metarPlain"></span>
+              <span class="weather-source">METAR-style display from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, not official airport weather.</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-title-block">
+        <h1 class="hero-title">Nikhil<br>Adapala</h1>
+        <p class="hero-sub">I build the things I'd want to fly, orbit, and hold in my hands — then I go learn to fly the real thing.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#builds">See what I've built</a>
+          <a class="btn btn-ghost" href="#briefing">Ask me something</a>
+          <button type="button" class="btn btn-ghost" id="flybyBtn">Request a flyby</button>
+        </div>
+        <form class="checkin" id="checkinForm" autocomplete="off">
+          <label class="checkin-label" for="checkinName">Passenger check-in</label>
+          <div class="checkin-row">
+            <input type="text" id="checkinName" placeholder="Your first name" maxlength="24">
+            <button type="submit" class="btn btn-ghost">Check in</button>
+          </div>
+        </form>
+        <div class="checkin-greeting" id="checkinGreeting" aria-live="polite" hidden>
+          <p class="checkin-hello" id="checkinHello"></p>
+          <p class="checkin-phonetic" id="checkinPhonetic"></p>
+          <button type="button" class="checkin-reset" id="checkinReset">Not you? Check in again</button>
+        </div>
+      </div>
+
+      <svg class="compass" viewBox="0 0 400 400" aria-hidden="true">
+        <circle cx="200" cy="200" r="188" class="c-ring c-ring-outer"/>
+        <circle cx="200" cy="200" r="150" class="c-ring"/>
+        <circle cx="200" cy="200" r="4" class="c-hub"/>
+        <g class="c-ticks"></g>
+        <text x="200" y="34" class="c-dir">N</text>
+        <text x="366" y="206" class="c-dir">E</text>
+        <text x="200" y="378" class="c-dir">S</text>
+        <text x="30" y="206" class="c-dir">W</text>
+        <line x1="200" y1="200" x2="200" y2="60" class="c-needle c-needle-main"/>
+        <line x1="200" y1="200" x2="200" y2="340" class="c-needle c-needle-tail"/>
+        <path class="route-line" d="M 200 200 L 120 120 L 90 60" />
+        <circle cx="120" cy="120" r="4" class="waypoint-dot"/>
+        <circle cx="90" cy="60" r="4" class="waypoint-dot"/>
+      </svg>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">
+      <span>flight plan filed — scroll for logbook</span>
+      <span class="scroll-line"></span>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 1 : LOGBOOK ============ -->
+  <section class="section" id="log">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num">01</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Pilot logbook</h2>
+      <p class="section-lede">Two internships, logged like flight time — where I flew, and what I flew.</p>
+
+      <div class="logbook">
+        <article class="log-entry" data-modal="traderoots" role="button" tabindex="0">
+          <div class="log-meta">
+            <span class="log-date">Summer 2025</span>
+            <span class="log-role">Software Development Intern</span>
+          </div>
+          <div class="log-body">
+            <h3>The City of Austin — I.T. Division</h3>
+            <p class="log-loc">Austin, TX</p>
+            <ul>
+              <li>Architected the React front end for TradeRoots, a full-stack skill-exchange platform built for the Austin community.</li>
+              <li>Engineered messaging and reviews with React, Node.js, REST APIs, and SQL to support the full trade workflow.</li>
+              <li>Directed a 5-person engineering team through the full build cycle — the project won the 2025 Entrepreneurship Award.</li>
+            </ul>
+            <span class="tap-hint">Tap for the full debrief &#8594;</span>
+          </div>
+        </article>
+
+        <article class="log-entry" data-modal="hearingtracker" role="button" tabindex="0">
+          <div class="log-meta">
+            <span class="log-date">Spring 2024 &ndash; Summer 2025</span>
+            <span class="log-role">Software Development Intern</span>
+          </div>
+          <div class="log-body">
+            <h3>HearingTracker</h3>
+            <p class="log-loc">Remote</p>
+            <ul>
+              <li>Designed a SQL schema managing 500+ hearing aid models across 12 brands, with 10+ spec fields each.</li>
+              <li>Built a React/Node.js app serving personalized recommendations to 30,000+ users across 20+ filter criteria.</li>
+              <li>Integrated Phonak and Oticon APIs to pull live device specs and pricing into the recommendation engine.</li>
+            </ul>
+            <span class="tap-hint">Tap for the full debrief &#8594;</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 2 : BUILDS ============ -->
+  <section class="section section-alt" id="builds">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num">02</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Things I've built</h2>
+      <p class="section-lede">Projects flown solo, end to end — physics, hardware, and machine learning.</p>
+
+      <div class="builds-grid">
+
+        <article class="build-card" data-modal="starforge" role="button" tabindex="0">
+          <div class="build-top">
+            <h3>StarForge</h3>
+            <span class="build-tag">3D space engine</span>
+          </div>
+          <p class="build-when">Summer 2026</p>
+          <ul>
+            <li>Procedurally generates entire star systems, worlds and all, from a single seed.</li>
+            <li>Solved floating-point drift on 47,000-unit planets with dynamic origin recentering every 3,000 units.</li>
+            <li>Architected multithreaded terrain streaming holding roughly 100,000 scatter instances in view at any altitude.</li>
+          </ul>
+          <span class="tap-hint">Tap to generate a system &#8594;</span>
+        </article>
+
+        <article class="build-card" data-modal="orbital" role="button" tabindex="0">
+          <div class="build-top">
+            <h3>N-Body Orbital Mechanics Simulator</h3>
+            <span class="build-tag">JavaScript &middot; Three.js</span>
+          </div>
+          <p class="build-when">Summer 2026</p>
+          <ul>
+            <li>A real-time gravitational simulator, ~2,400 lines of vanilla JS — every body pulls every other body, every frame.</li>
+            <li>Symplectic leapfrog integrator conserves orbital energy indefinitely, stable at 60 FPS instead of drifting like naive Euler integration.</li>
+            <li>Models tidal disruption at the Roche limit and momentum-conserving mergers, rendered with custom GLSL shaders.</li>
+          </ul>
+          <a class="build-link" href="orbital_simulator.html" onclick="event.stopPropagation()">Open the simulator</a>
+          <span class="tap-hint">Tap to play with gravity &#8594;</span>
+        </article>
+
+        <article class="build-card" data-modal="hand" role="button" tabindex="0">
+          <div class="build-top">
+            <h3>5 D.O.F. Robotic Hand</h3>
+            <span class="build-tag">SolidWorks &middot; Arduino &middot; Python</span>
+          </div>
+          <p class="build-when">Summer 2026</p>
+          <ul>
+            <li>Designed and 3D-printed a robotic hand, modeling every finger assembly in SolidWorks.</li>
+            <li>Programmed an Arduino to independently actuate 5 servos over a custom serial protocol.</li>
+            <li>Built two Python pipelines: real-time gesture recognition via webcam, and speech-driven ASL fingerspelling.</li>
+          </ul>
+          <a class="build-link" href="ROBOTIC_HAND_README.md" onclick="event.stopPropagation()">Read the build notes</a>
+          <span class="tap-hint">Tap to move the fingers &#8594;</span>
+        </article>
+
+        <article class="build-card" data-modal="finml" role="button" tabindex="0">
+          <div class="build-top">
+            <h3>Multimodal Deep Learning for Financial Market Prediction</h3>
+            <span class="build-tag">TensorFlow &middot; FinBERT</span>
+          </div>
+          <p class="build-when">Summer 2025 &middot; Financial AI Research</p>
+          <ul>
+            <li>Led a peer-reviewed study benchmarking six architectures for equity price forecasting.</li>
+            <li>Cut forecast error 34% and doubled R&sup2; to 0.68 by fusing market data with FinBERT sentiment signals.</li>
+            <li>Designed a custom hybrid architecture and ran ablations isolating the top predictive feature contributors.</li>
+          </ul>
+          <span class="tap-hint">Tap to see the lift &#8594;</span>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 3 : TERMINAL ============ -->
+  <section class="section terminal-section" id="terminal">
+    <div class="runway" aria-hidden="true"></div>
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num wp-green">03</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Terminal</h2>
+      <p class="section-lede">Every repository, live from GitHub — arrivals and departures. Tap a row to open it.</p>
+
+      <div class="board" id="board">
+        <div class="board-head">
+          <span>Flight</span><span class="board-head-name">Repository</span><span>Stack</span><span>Updated</span><span>Status</span>
+        </div>
+        <div class="board-rows" id="boardRows">
+          <p class="board-loading">Pulling live board from github.com/onedope512&hellip;</p>
+        </div>
+      </div>
+      <a class="build-link" href="https://github.com/onedope512" target="_blank" rel="noopener">View the full hangar on GitHub</a>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 4 : RATINGS ============ -->
+  <section class="section" id="ratings">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num wp-amber">04</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Ratings &amp; certificates</h2>
+      <div class="ratings-row">
+        <div class="rating-card">
+          <span class="rating-code">PPL</span>
+          <span class="rating-name">Private Pilot's License</span>
+          <span class="rating-when">Fall 2026 &middot; estimated</span>
+        </div>
+        <div class="rating-card">
+          <span class="rating-code">CSWA</span>
+          <span class="rating-name">Certified SolidWorks Associate</span>
+          <span class="rating-when">Summer 2026</span>
+        </div>
+        <div class="rating-card">
+          <span class="rating-code">PCPP</span>
+          <span class="rating-name">Certified Professional Python Programmer</span>
+          <span class="rating-when">Summer 2025</span>
+        </div>
+      </div>
+      <div class="education-strip">
+        <span class="field-label">Education</span>
+        <span class="field-value">The University of Texas at Austin — B.S. Aerospace Engineering, B.S. Mathematics &middot; Spring 2029 &middot; GPA 4.00</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 4 : INSTRUMENT PANEL ============ -->
+  <section class="section section-alt" id="panel">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num wp-blue">05</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Instrument panel</h2>
+      <p class="section-lede">What's on board.</p>
+
+      <div class="panel-grid">
+        <div class="panel-group">
+          <h3>Languages</h3>
+          <div class="chips">
+            <span>Python</span><span>Java</span><span>C++</span><span>JavaScript</span><span>C#</span><span>R</span><span>SQL</span><span>HTML/CSS</span>
+          </div>
+        </div>
+        <div class="panel-group">
+          <h3>Libraries &amp; frameworks</h3>
+          <div class="chips">
+            <span>TensorFlow/Keras</span><span>Keras Tuner</span><span>scikit-learn</span><span>pandas</span><span>NumPy</span><span>MediaPipe</span><span>OpenCV</span><span>React.js</span><span>Node.js</span><span>REST APIs</span><span>Firebase</span><span>PostgreSQL</span><span>MySQL</span>
+          </div>
+        </div>
+        <div class="panel-group">
+          <h3>Applications &amp; tools</h3>
+          <div class="chips">
+            <span>SolidWorks</span><span>MATLAB</span><span>Arduino IDE</span><span>Git</span><span>Figma</span><span>3D Printing</span><span>Soldering</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 5 : BRIEFING ============ -->
+  <section class="section" id="briefing">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num wp-magenta">06</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Request a briefing</h2>
+      <p class="section-lede">Ask something about the projects, the background, or the flight training. Type a question, or tap one.</p>
+
+      <div class="briefing-box">
+        <div class="briefing-chips">
+          <button type="button" class="chip-btn" data-q="What have you built?">What have you built?</button>
+          <button type="button" class="chip-btn" data-q="Are you actually a pilot?">Are you actually a pilot?</button>
+          <button type="button" class="chip-btn" data-q="What are you studying?">What are you studying?</button>
+          <button type="button" class="chip-btn" data-q="What was your internship experience?">Internship experience?</button>
+          <button type="button" class="chip-btn" data-q="How do I contact you?">How do I contact you?</button>
+          <button type="button" class="chip-btn" data-q="What can you code in?">What can you code in?</button>
+          <button type="button" class="chip-btn chip-btn-surprise" id="surpriseBtn">Surprise me</button>
+        </div>
+
+        <form class="briefing-form" id="briefingForm">
+          <input type="text" id="briefingInput" placeholder="Type your question&hellip;" autocomplete="off">
+          <button type="submit" class="btn btn-primary">Request briefing</button>
+        </form>
+
+        <div class="briefing-output" id="briefingOutput" aria-live="polite">
+          <p class="briefing-placeholder">Awaiting request&hellip; no briefing on file yet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 7 : PATTERN WORK (LANDING GAME) ============ -->
+  <section class="section section-alt" id="pattern">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num wp-green">07</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Your turn: land it</h2>
+      <p class="section-lede">Fly the final approach into Austin. Keep two white and two red on the PAPI lights beside the runway, ride out the gusts, and flare just before the wheels touch.</p>
+
+      <div class="game" id="game">
+        <canvas id="gameCanvas" aria-label="Landing game. Use the up and down arrow keys or the nose buttons to fly the approach."></canvas>
+        <div class="game-overlay" id="gameOverlay">
+          <p class="game-title" id="gameTitle">Cleared to land, runway 18 left</p>
+          <p class="game-msg" id="gameMsg">Hold the nose up to slow your descent, nose down to steepen it. Too fast at touchdown and the gear won't survive.</p>
+          <button type="button" class="btn btn-primary" id="gameStart">Start approach</button>
+          <p class="game-best" id="gameBest"></p>
+        </div>
+        <div class="game-controls">
+          <button type="button" class="game-btn" id="noseDown">Nose down</button>
+          <span class="game-keys">or &uarr; &darr; keys</span>
+          <button type="button" class="game-btn" id="noseUp">Nose up</button>
+        </div>
+        <p class="game-badge" id="gameBadge" hidden>Licensed pilot &mdash; earned with a landing score of 80 or better</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAYPOINT 8 : AIRPORTS VISITED ============ -->
+  <section class="section" id="destinations">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num wp-blue">08</span><span class="wp-label">Waypoint</span></div>
+      <h2 class="section-title">Airports I've visited</h2>
+      <p class="section-lede">Eight Texas fields on an interactive chart. Select an airport to trace its position from Austin Executive.</p>
+      <div class="globe-wrap">
+        <div class="airport-map">
+          <canvas id="globeCanvas" aria-label="Interactive map of eight Texas airports Nikhil has visited"></canvas>
+          <div class="airport-map-controls" aria-label="Map zoom">
+            <button type="button" id="mapZoomIn" aria-label="Zoom map in">+</button>
+            <button type="button" id="mapZoomOut" aria-label="Zoom map out">−</button>
+            <button type="button" id="mapReset" aria-label="Reset map view">↺</button>
+          </div>
+        </div>
+        <div class="airport-list">
+          <p class="airport-list-label">SELECT A FIELD</p>
+          <div class="globe-places" id="globePlaces"></div>
+          <p class="airport-selection" id="airportSelection" aria-live="polite"></p>
+        </div>
+      </div>
+      <p class="map-note">Lines use Austin Executive as a map anchor; they do not represent logged flights. Airport positions from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dafd/" target="_blank" rel="noopener">FAA Chart Supplement</a>.</p>
+    </div>
+  </section>
+
+  <!-- ============ DESTINATION ============ -->
+  <section class="section destination" id="destination">
+    <div class="section-inner">
+      <div class="waypoint-marker"><span class="wp-num">&#10003;</span><span class="wp-label">Destination</span></div>
+      <h2 class="section-title">Control tower</h2>
+      <p class="section-lede">If any of this is worth a conversation, the tower is listening on all three frequencies below.</p>
+
+      <div class="tower">
+        <svg class="radar" viewBox="0 0 300 300" aria-hidden="true">
+          <circle cx="150" cy="150" r="130" class="radar-ring"/>
+          <circle cx="150" cy="150" r="87" class="radar-ring"/>
+          <circle cx="150" cy="150" r="44" class="radar-ring"/>
+          <line x1="150" y1="20" x2="150" y2="280" class="radar-cross"/>
+          <line x1="20" y1="150" x2="280" y2="150" class="radar-cross"/>
+          <g class="radar-sweep-group">
+            <path d="M150 150 L150 20 A130 130 0 0 1 245 58 Z" class="radar-sweep"/>
+          </g>
+          <circle cx="150" cy="70" r="5" class="radar-blip blip-email"/>
+          <circle cx="235" cy="205" r="5" class="radar-blip blip-linkedin"/>
+          <circle cx="70" cy="205" r="5" class="radar-blip blip-github"/>
+        </svg>
+
+        <div class="destination-grid">
+          <a class="dest-card" href="mailto:adapalanikhil@gmail.com">
+            <span class="dest-dot dest-dot-email" aria-hidden="true"></span>
+            <span class="dest-label">Email</span>
+            <span class="dest-value">adapalanikhil@gmail.com</span>
+          </a>
+          <a class="dest-card" href="https://linkedin.com/in/nikhiladapala" target="_blank" rel="noopener">
+            <span class="dest-dot dest-dot-linkedin" aria-hidden="true"></span>
+            <span class="dest-label">LinkedIn</span>
+            <span class="dest-value">linkedin.com/in/nikhiladapala</span>
+          </a>
+          <a class="dest-card" href="https://github.com/onedope512" target="_blank" rel="noopener">
+            <span class="dest-dot dest-dot-github" aria-hidden="true"></span>
+            <span class="dest-label">GitHub</span>
+            <span class="dest-value">github.com/onedope512</span>
+          </a>
+          <a class="dest-card" href="resume.html" data-page-transition>
+            <span class="dest-dot dest-dot-resume" aria-hidden="true"></span>
+            <span class="dest-label">Résumé</span>
+            <span class="dest-value">View my boarding pass</span>
+          </a>
+        </div>
+        <a class="resume-direct" href="Nikhil-Adapala-Resume.pdf" download="Nikhil-Adapala-Resume.pdf">Download the original résumé PDF ↗</a>
+
+        <div class="paper-wrap">
+          <form class="paper-form" id="paperForm">
+            <h3 class="paper-title">Send a message to the tower</h3>
+            <p class="paper-note">Fold it up and it opens your email app with the message ready to send.</p>
+            <label class="paper-field">
+              <span>Your name</span>
+              <input type="text" id="paperName" maxlength="60" autocomplete="name">
+            </label>
+            <label class="paper-field">
+              <span>Message</span>
+              <textarea id="paperMsg" rows="4" maxlength="2000" required></textarea>
+            </label>
+            <button type="submit" class="btn btn-primary">Fold &amp; send</button>
+            <p class="paper-status" id="paperStatus" aria-live="polite"></p>
+          </form>
+          <svg class="paper-plane" id="paperPlane" viewBox="0 0 64 40" aria-hidden="true">
+            <path d="M2 21 L62 2 L36 38 L29 25 Z" class="paper-plane-body"/>
+            <path d="M29 25 L62 2 L22 22 Z" class="paper-plane-fold"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+
+  <!-- ============ MODAL: STARFORGE ============ -->
+  <div class="modal-panel theme-starforge" data-panel="starforge" role="dialog" aria-modal="true" aria-labelledby="title-starforge">
+    <div class="modal-fx" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <span class="modal-kicker">Software project &middot; Summer 2026</span>
+      <h3 id="title-starforge">StarForge</h3>
+      <p class="modal-sub">A procedural 3D space engine — full star systems from a single number</p>
+    </div>
+    <div class="modal-body">
+      <p>StarForge turns one seed into an entire star system: a star, its planets, and every scattered rock and dune on them. Feed it the same seed twice and you get the exact same universe back — same star class, same worlds, same terrain, down to the last placed instance. That determinism is what makes a one-person space engine possible: nothing has to be hand-placed or saved to disk, it just has to be re-derivable.</p>
+      <p>The hard part wasn't generating a planet, it was standing on one. At a scale of 47,000 units, 32-bit floating point stops being precise enough — jitter and z-fighting creep in the farther you get from the origin. StarForge fixes this by silently recentering the origin on the player every 3,000 units, so the numbers in play never get large enough to lose precision. Terrain itself streams in on multiple threads, keeping around 100,000 scatter instances (grass, rock, debris) resident at any given altitude, from orbit down to the surface.</p>
+
+      <div class="widget widget-starforge">
+        <div class="widget-label">System generator</div>
+        <canvas id="starforgeCanvas" width="440" height="230" aria-label="Generated star system preview"></canvas>
+        <div class="widget-readout" id="starforgeReadout">Seed 0 &middot; generating&hellip;</div>
+        <div class="widget-controls">
+          <label class="widget-field">
+            <span>Seed</span>
+            <input type="number" id="starforgeSeed" value="4821" min="0" max="999999" step="1">
+          </label>
+          <button type="button" class="btn btn-widget" id="starforgeReroll">Reroll seed</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: ORBITAL SIMULATOR ============ -->
+  <div class="modal-panel theme-orbital" data-panel="orbital" role="dialog" aria-modal="true" aria-labelledby="title-orbital">
+    <div class="modal-fx" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <span class="modal-kicker">Software project &middot; Summer 2026</span>
+      <h3 id="title-orbital">N-Body Orbital Mechanics Simulator</h3>
+      <p class="modal-sub">Real Newtonian gravity, running live in a browser tab</p>
+    </div>
+    <div class="modal-body">
+      <p>Every body in this simulator pulls on every other body, every physics step — real Newtonian N-body gravity, not a scripted animation. The integrator is a symplectic leapfrog (half-kick, drift, recompute, half-kick), which is the reason orbits here don't slowly spiral in or fly apart over time the way a naive Euler integrator's would. Energy is conserved indefinitely, so a stable binary system placed once will still be a stable binary an hour later.</p>
+      <p>On top of the core physics: a GPU vertex-shader grid that physically deforms around massive bodies, a full-sky procedural nebula built from layered fractal noise, and a Roche-limit check that shreds any body that strays too close to something far more massive, spawning debris along its orbital tangent. Drag the slider below to feel what changing the strength of gravity does to a simple two-body orbit in real time.</p>
+
+      <div class="widget widget-orbital">
+        <div class="widget-label">Two-body gravity, live</div>
+        <canvas id="orbitalCanvas" width="440" height="230" aria-label="Live two-body orbit preview"></canvas>
+        <div class="widget-controls">
+          <label class="widget-field widget-field-wide">
+            <span>Gravity (G)</span>
+            <input type="range" id="orbitalG" min="20" max="220" value="90">
+          </label>
+          <button type="button" class="btn btn-widget" id="orbitalReset">Reset orbit</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <a class="modal-link" href="orbital_simulator.html">Open the full simulator</a>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: ROBOTIC HAND ============ -->
+  <div class="modal-panel theme-hand" data-panel="hand" role="dialog" aria-modal="true" aria-labelledby="title-hand">
+    <div class="modal-fx" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <span class="modal-kicker">Software project &middot; Summer 2026</span>
+      <h3 id="title-hand">5 D.O.F. Robotic Hand</h3>
+      <p class="modal-sub">One servo per finger, driven by gesture or by speech</p>
+    </div>
+    <div class="modal-body">
+      <p>Every finger assembly was modeled in SolidWorks before it was ever printed, then built as a physical hand with five servos — one per finger, wired to an Arduino on pins 3, 4, 5, 9, and 10. The Arduino owns a tiny serial protocol: a single ASCII character either nudges all five servos by 10 degrees, resets them to a neutral 90-degree pose, or snaps them directly to a named handshape.</p>
+      <p>Two independent Python pipelines drive that same protocol. The first watches a webcam through MediaPipe's gesture recognizer and nudges the hand whenever it sees a recognized gesture. The second listens to speech, transcribes it, and fingerspells each word letter by letter in an approximation of the ASL manual alphabet — a real, if slow, part of ASL, though this hardware has only one open/curl axis per finger and no thumb opposition, so a handful of letters that differ mainly by finger-crossing (like U vs. V) end up looking near-identical.</p>
+
+      <div class="widget widget-hand">
+        <div class="widget-label">Move the fingers</div>
+        <svg class="hand-svg" viewBox="0 0 300 260" aria-hidden="true">
+          <rect x="90" y="140" width="120" height="100" rx="26" class="hand-palm"/>
+          <g class="finger" id="finger-thumb" style="transform-origin: 92px 172px;">
+            <rect x="52" y="152" width="46" height="34" rx="16" class="finger-seg"/>
+          </g>
+          <g class="finger" id="finger-index" style="transform-origin: 112px 140px;">
+            <rect x="100" y="60" width="26" height="86" rx="13" class="finger-seg"/>
+          </g>
+          <g class="finger" id="finger-middle" style="transform-origin: 145px 140px;">
+            <rect x="133" y="42" width="26" height="104" rx="13" class="finger-seg"/>
+          </g>
+          <g class="finger" id="finger-ring" style="transform-origin: 178px 140px;">
+            <rect x="166" y="50" width="26" height="96" rx="13" class="finger-seg"/>
+          </g>
+          <g class="finger" id="finger-pinky" style="transform-origin: 208px 140px;">
+            <rect x="197" y="66" width="24" height="80" rx="12" class="finger-seg"/>
+          </g>
+        </svg>
+        <div class="hand-sliders">
+          <label class="hand-slider"><span>Thumb</span><input type="range" min="0" max="180" value="90" data-finger="thumb"></label>
+          <label class="hand-slider"><span>Index</span><input type="range" min="0" max="180" value="90" data-finger="index"></label>
+          <label class="hand-slider"><span>Middle</span><input type="range" min="0" max="180" value="90" data-finger="middle"></label>
+          <label class="hand-slider"><span>Ring</span><input type="range" min="0" max="180" value="90" data-finger="ring"></label>
+          <label class="hand-slider"><span>Pinky</span><input type="range" min="0" max="180" value="90" data-finger="pinky"></label>
+        </div>
+        <div class="widget-controls">
+          <button type="button" class="btn btn-widget" id="handReset">Reset to neutral</button>
+          <button type="button" class="btn btn-widget" id="handWave">Wave hello</button>
+        </div>
+
+        <form class="asl-form" id="aslForm" autocomplete="off">
+          <div class="widget-label">Fingerspell a name</div>
+          <div class="asl-row">
+            <input type="text" id="aslInput" placeholder="Type a name" maxlength="16">
+            <button type="submit" class="btn btn-widget">Fingerspell</button>
+          </div>
+          <div class="asl-word" id="aslWord" aria-live="polite"></div>
+          <p class="asl-note" id="aslNote">These are the same handshapes the Arduino sketch sends to the real hand.</p>
+        </form>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <a class="modal-link" href="ROBOTIC_HAND_README.md">Read the full build notes</a>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: FINANCIAL ML ============ -->
+  <div class="modal-panel theme-finml" data-panel="finml" role="dialog" aria-modal="true" aria-labelledby="title-finml">
+    <div class="modal-fx" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <span class="modal-kicker">Financial AI research &middot; Summer 2025</span>
+      <h3 id="title-finml">Multimodal Deep Learning for Financial Market Prediction</h3>
+      <p class="modal-sub">Teaching a forecaster to read the news, not just the chart</p>
+    </div>
+    <div class="modal-body">
+      <p>Most equity forecasters only ever see price history. This study asked what happens if you also give a model language: FinBERT-derived sentiment scores pulled from financial text, fused with the raw market data inside a custom hybrid architecture. Six architectures were benchmarked head-to-head under the same conditions, and ablations were run afterward to isolate exactly which fused features were actually doing the predictive work, rather than just along for the ride.</p>
+      <p>Adding sentiment wasn't a marginal tweak — it cut forecast error by 34% and doubled R&sup2; from 0.34 to 0.68. Toggle the switch below to see that shift the way it showed up in the results: tighter error, and a hybrid model that leaves the five single-modality baselines behind.</p>
+
+      <div class="widget widget-finml">
+        <div class="widget-toggle">
+          <span>Market data only</span>
+          <label class="switch">
+            <input type="checkbox" id="finmlToggle">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+          <span>+ FinBERT sentiment</span>
+        </div>
+        <div class="finml-stats">
+          <div class="finml-stat">
+            <span class="finml-stat-label">Forecast error</span>
+            <div class="finml-bar"><div class="finml-bar-fill finml-bar-error" id="finmlErrorBar"></div></div>
+            <span class="finml-stat-value" id="finmlErrorValue">baseline</span>
+          </div>
+          <div class="finml-stat">
+            <span class="finml-stat-label">R&sup2;</span>
+            <div class="finml-bar"><div class="finml-bar-fill finml-bar-r2" id="finmlR2Bar"></div></div>
+            <span class="finml-stat-value" id="finmlR2Value">0.34</span>
+          </div>
+        </div>
+        <div class="finml-arch-label">Six architectures benchmarked</div>
+        <div class="finml-chart" id="finmlChart">
+          <div class="finml-arch"><div class="finml-arch-bar" data-h-off="34" data-h-on="46"></div><span>LSTM</span></div>
+          <div class="finml-arch"><div class="finml-arch-bar" data-h-off="38" data-h-on="52"></div><span>GRU</span></div>
+          <div class="finml-arch"><div class="finml-arch-bar" data-h-off="41" data-h-on="55"></div><span>CNN-LSTM</span></div>
+          <div class="finml-arch"><div class="finml-arch-bar" data-h-off="44" data-h-on="58"></div><span>TCN</span></div>
+          <div class="finml-arch"><div class="finml-arch-bar" data-h-off="40" data-h-on="60"></div><span>Transformer</span></div>
+          <div class="finml-arch finml-arch-hybrid"><div class="finml-arch-bar" data-h-off="47" data-h-on="88"></div><span>Custom Hybrid</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: TRADEROOTS / CITY OF AUSTIN ============ -->
+  <div class="modal-panel theme-traderoots" data-panel="traderoots" role="dialog" aria-modal="true" aria-labelledby="title-traderoots">
+    <div class="modal-fx" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <span class="modal-kicker">Software Development Intern &middot; Summer 2025</span>
+      <h3 id="title-traderoots">The City of Austin — TradeRoots</h3>
+      <p class="modal-sub">A skill-exchange platform, built for and with the Austin community</p>
+    </div>
+    <div class="modal-body">
+      <p>TradeRoots lets Austin residents trade skills instead of money — a lesson for a lawn mow, a logo for a bike tune-up. I architected the React front end and built out messaging and reviews end to end with Node.js, REST APIs, and SQL, covering the full loop from posting a skill to closing out a trade. I also directed a 5-person engineering team through the entire build cycle, from first sketch to shipped product — the project went on to win the City's 2025 Entrepreneurship Award.</p>
+      <p>The three tabs below are small, real interactions pulled straight out of the app: send a message the way a trade conversation actually starts, leave the kind of review that closes one out, and see who was in the room building it.</p>
+
+      <div class="widget widget-traderoots">
+        <div class="tr-tabs" role="tablist">
+          <button type="button" class="tr-tab is-active" data-tab="messaging" role="tab">Messaging</button>
+          <button type="button" class="tr-tab" data-tab="reviews" role="tab">Reviews</button>
+          <button type="button" class="tr-tab" data-tab="team" role="tab">Team</button>
+        </div>
+
+        <div class="tr-panel is-active" data-tab-panel="messaging">
+          <div class="tr-chat" id="trChat">
+            <div class="tr-bubble tr-bubble-them">Hey! Saw you can fix bikes — I can tutor calculus in return?</div>
+            <div class="tr-bubble tr-bubble-me">That works, when's good for you?</div>
+          </div>
+          <form class="tr-chat-form" id="trChatForm">
+            <input type="text" id="trChatInput" placeholder="Type a reply&hellip;" autocomplete="off">
+            <button type="submit" class="btn btn-widget">Send</button>
+          </form>
+        </div>
+
+        <div class="tr-panel" data-tab-panel="reviews">
+          <p class="tr-review-prompt">Rate the trade:</p>
+          <div class="tr-stars" id="trStars">
+            <button type="button" class="tr-star" data-star="1">&#9733;</button>
+            <button type="button" class="tr-star" data-star="2">&#9733;</button>
+            <button type="button" class="tr-star" data-star="3">&#9733;</button>
+            <button type="button" class="tr-star" data-star="4">&#9733;</button>
+            <button type="button" class="tr-star" data-star="5">&#9733;</button>
+          </div>
+          <p class="tr-review-label" id="trReviewLabel">Tap a star to leave a review</p>
+        </div>
+
+        <div class="tr-panel" data-tab-panel="team">
+          <p class="tr-team-prompt">The 5-person crew — tap a seat:</p>
+          <div class="tr-team" id="trTeam">
+            <button type="button" class="tr-avatar" data-role="Frontend Lead">NA</button>
+            <button type="button" class="tr-avatar" data-role="Backend">JK</button>
+            <button type="button" class="tr-avatar" data-role="Design">MP</button>
+            <button type="button" class="tr-avatar" data-role="Product">RS</button>
+            <button type="button" class="tr-avatar" data-role="QA">TL</button>
+          </div>
+          <p class="tr-team-label" id="trTeamLabel">Tap an avatar to see their role</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: HEARINGTRACKER ============ -->
+  <div class="modal-panel theme-hearing" data-panel="hearingtracker" role="dialog" aria-modal="true" aria-labelledby="title-hearing">
+    <div class="modal-fx" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <span class="modal-kicker">Software Development Intern &middot; Spring 2024 &ndash; Summer 2025</span>
+      <h3 id="title-hearing">HearingTracker</h3>
+      <p class="modal-sub">Recommending the right hearing aid out of 500+, live</p>
+    </div>
+    <div class="modal-body">
+      <p>HearingTracker's recommendation engine sits on top of a SQL schema tracking 500+ hearing aid models across 12 brands, with more than 10 spec fields per model — battery type, Bluetooth support, tinnitus masking, water resistance, and more. The React/Node.js app on top of it narrows that catalog down using 20+ filter criteria, serving personalized recommendations to over 30,000 users, with Phonak and Oticon APIs pulled in live for current specs and pricing rather than a stale snapshot.</p>
+      <p>The filters below are a small slice of the real thing — pick a brand and a feature or two and watch the match count actually move.</p>
+
+      <div class="widget widget-hearing">
+        <div class="ht-filters">
+          <label class="widget-field widget-field-wide">
+            <span>Brand</span>
+            <select id="htBrand">
+              <option value="all">All brands</option>
+              <option value="Phonak">Phonak</option>
+              <option value="Oticon">Oticon</option>
+              <option value="Widex">Widex</option>
+              <option value="Starkey">Starkey</option>
+            </select>
+          </label>
+          <div class="ht-checks" id="htChecks">
+            <label><input type="checkbox" data-feat="Bluetooth"> Bluetooth</label>
+            <label><input type="checkbox" data-feat="Rechargeable"> Rechargeable</label>
+            <label><input type="checkbox" data-feat="Tinnitus Masking"> Tinnitus masking</label>
+            <label><input type="checkbox" data-feat="Water Resistant"> Water resistant</label>
+          </div>
+        </div>
+        <p class="ht-count" id="htCount">Showing 8 of 500+ models</p>
+        <div class="ht-list" id="htList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <span>Austin, TX</span>
+  <span>Filed &amp; built by Nikhil Adapala</span>
+</footer>
+
+<div class="cockpit-dock" id="cockpitDock" role="group" aria-label="Cockpit controls">
+  <button type="button" class="dock-switch" id="nightToggle" aria-pressed="false" title="Night flight mode">
+    <span class="dock-led" aria-hidden="true"></span><span>Night flight</span>
+  </button>
+  <button type="button" class="dock-switch" id="radioToggle" aria-pressed="false" title="Ambient cockpit sound and tower chatter">
+    <span class="dock-led" aria-hidden="true"></span><span>ATC radio</span>
+  </button>
+  <div class="xpdr">
+    <button type="button" class="xpdr-display" id="xpdrBtn" aria-expanded="false" aria-controls="xpdrPad" title="Transponder. Type a four-digit squawk code, digits 0 to 7.">
+      <span class="xpdr-label">XPDR</span>
+      <span class="xpdr-code" id="xpdrCode">1200</span>
+    </button>
+    <div class="xpdr-pad" id="xpdrPad" hidden>
+      <p class="xpdr-hint">Squawk a code. Try 7700 or 7600.</p>
+      <div class="xpdr-keys">
+        <button type="button" data-digit="1">1</button><button type="button" data-digit="2">2</button><button type="button" data-digit="3">3</button><button type="button" data-digit="4">4</button>
+        <button type="button" data-digit="5">5</button><button type="button" data-digit="6">6</button><button type="button" data-digit="7">7</button><button type="button" data-digit="0">0</button>
+        <button type="button" class="xpdr-wide" id="xpdrClr">CLR</button><button type="button" class="xpdr-wide" id="xpdrIdent">IDENT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="cockpit.js"></script>
+<script src="script.js"></script>
+<script src="game.js"></script>
+<script src="airport-map.js"></script>
+</body>
+</html>

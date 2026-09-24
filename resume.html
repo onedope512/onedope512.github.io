@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikhil Adapala — Boarding Pass Résumé</title>
+<meta name="description" content="Résumé of Nikhil Adapala, Aerospace Engineering & Mathematics at UT Austin.">
+<link rel="icon" type="image/png" href="favicon.png">
+<script>
+try{
+  const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+  const override = sessionStorage.getItem('themeOverride');
+  if(override === 'night' || (!override && (localStorage.getItem('night') === '1' || hour < 6 || hour >= 20))) document.documentElement.classList.add('night');
+}catch(e){}
+</script>
+<link rel="stylesheet" href="page-transition.css">
+<script src="page-transition.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #E4DAC0;
+    --ticket: #FBF7EC;
+    --ink: #2A2620;
+    --ink-soft: #5A5344;
+    --line: #CBBF9C;
+    --blue: #1F5C82;
+    --magenta: #9C3B6E;
+    --display: "Archivo", sans-serif;
+    --sans: "IBM Plex Sans", sans-serif;
+    --mono: "IBM Plex Mono", monospace;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .toolbar{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .toolbar a{ font-family: var(--mono); font-size: 13px; color: var(--blue); }
+  .toolbar-actions{ display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+  .print-btn{
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 11px 20px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  .print-btn:hover{ background: var(--blue); border-color: var(--blue); }
+  .download-btn{ display: inline-block; text-decoration: none; }
+  .toolbar a.download-btn{ color: var(--paper); }
+  .print-secondary{ background: transparent; color: var(--ink); }
+  .print-secondary:hover{ color: var(--paper); }
+  html.night{
+    --paper: #10172a;
+    --ink: #ece6d4;
+    --ink-soft: #a9b0c2;
+    --line: #34405e;
+    --blue: #a8d2f4;
+    --magenta: #f08cc0;
+    color-scheme: dark;
+  }
+  html.night .pass{
+    --ink: #2A2620;
+    --ink-soft: #5A5344;
+    --line: #CBBF9C;
+    --blue: #1F5C82;
+    --magenta: #9C3B6E;
+    color-scheme: light;
+  }
+  html.night .toolbar > a{ color: #a8d2f4; }
+  .sheet{ animation: pass-arrive 0.7s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes pass-arrive{ from{ opacity: 0; transform: translateY(18px); } to{ opacity: 1; transform: none; } }
+
+  .sheet{ max-width: 860px; margin: 20px auto 48px; padding: 0 24px; }
+
+  /* ---- the boarding pass ---- */
+  .pass{
+    display: grid;
+    grid-template-columns: 1fr 210px;
+    background: var(--ticket);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .pass-main{ padding: 22px 26px 20px; }
+  .pass-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .pass-airline{ font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: 0.06em; }
+  .pass-class{ font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
+  .pass-name{ font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.05; margin: 0 0 4px; }
+  .pass-sub{ color: var(--ink-soft); margin: 0 0 18px; }
+  .route{ display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+  .route-code{ font-family: var(--display); font-weight: 800; font-size: 30px; }
+  .route-city{ display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); font-weight: 400; }
+  .route-line{ flex: 1; height: 0; border-top: 2px dashed var(--line); position: relative; }
+  .route-line::after{
+    content: "\2708";
+    position: absolute;
+    left: 50%;
+    top: -13px;
+    transform: translateX(-50%);
+    font-size: 18px;
+    color: var(--magenta);
+    background: var(--ticket);
+    padding: 0 6px;
+  }
+  .fields{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .field-k{ display: block; font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft); }
+  .field-v{ display: block; font-weight: 600; font-size: 14px; }
+
+  .pass-stub{
+    border-left: 2px dashed var(--line);
+    padding: 22px 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pass-stub::before, .pass-stub::after{
+    content: "";
+    position: absolute;
+    left: -11px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+  }
+  .pass-stub::before{ top: -11px; }
+  .pass-stub::after{ bottom: -11px; }
+  .stub-links{ display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; }
+  .stub-links a{ color: var(--ink); text-decoration: none; word-break: break-word; }
+  .barcode{ margin-top: auto; height: 46px; display: flex; align-items: stretch; gap: 1.5px; }
+  .barcode span{ background: var(--ink); display: block; }
+
+  /* ---- résumé body ---- */
+  .section{ margin-top: 26px; }
+  .section h2{
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 16px;
+    margin: 0 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .entry{ margin-bottom: 14px; break-inside: avoid; }
+  .entry-head{ display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .entry-title{ font-weight: 600; font-size: 14.5px; }
+  .entry-when{ font-family: var(--mono); font-size: 12px; color: var(--blue); white-space: nowrap; }
+  .entry-sub{ color: var(--ink-soft); font-size: 13px; }
+  .entry ul{ margin: 6px 0 0; padding-left: 18px; }
+  .entry li{ margin-bottom: 3px; }
+  .skills{ display: grid; grid-template-columns: 170px 1fr; gap: 6px 14px; }
+  .skills dt{ font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+  .skills dd{ margin: 0; }
+
+  @media (max-width: 700px){
+    .toolbar{ align-items: flex-start; flex-direction: column; }
+    .toolbar-actions{ justify-content: flex-start; }
+    .pass{ grid-template-columns: 1fr; }
+    .pass-stub{ border-left: none; border-top: 2px dashed var(--line); }
+    .pass-stub::before, .pass-stub::after{ display: none; }
+    .fields{ grid-template-columns: repeat(2, 1fr); }
+    .skills{ grid-template-columns: 1fr; }
+  }
+
+  @page{ size: letter; margin: 0.45in; }
+  @media print{
+    :root, html.night{
+      --paper: #fff;
+      --ink: #2A2620;
+      --ink-soft: #5A5344;
+      --line: #CBBF9C;
+      --blue: #1F5C82;
+      --magenta: #9C3B6E;
+      color-scheme: light;
+    }
+    body{ background: #fff; font-size: 11.5px; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .toolbar{ display: none; }
+    .sheet{ margin: 0; padding: 0; max-width: none; }
+    .pass{ border-radius: 10px; }
+    .pass-stub::before, .pass-stub::after{ background: #fff; }
+    .pass-name{ font-size: 28px; }
+    .section{ margin-top: 16px; }
+    .entry{ margin-bottom: 9px; }
+    .sheet{ animation: none; }
+    a{ color: inherit; }
+  }
+  @media (prefers-reduced-motion: reduce){ .sheet{ animation: none; } }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="index.html#destination" data-page-transition>← Back to the flight plan</a>
+  <div class="toolbar-actions">
+    <a class="print-btn download-btn" href="Nikhil-Adapala-Resume.pdf" download="Nikhil-Adapala-Resume.pdf">Download original résumé PDF</a>
+    <button type="button" class="print-btn print-secondary" id="printBtn">Print this boarding pass</button>
+  </div>
+</div>
+
+<main class="sheet">
+  <section class="pass" aria-label="Boarding pass">
+    <div class="pass-main">
+      <div class="pass-top">
+        <span class="pass-airline">BOARDING PASS</span>
+        <span class="pass-class">Class: Aerospace Engineering + Mathematics</span>
+      </div>
+      <h1 class="pass-name">Nikhil Adapala</h1>
+      <p class="pass-sub">Software, robotics, and flight. Student pilot working toward a Private Pilot's License.</p>
+      <div class="route" aria-label="Route from Austin to graduation">
+        <div class="route-code">AUS<span class="route-city">Austin, TX</span></div>
+        <div class="route-line" aria-hidden="true"></div>
+        <div class="route-code">B.S.<span class="route-city">Spring 2029</span></div>
+      </div>
+      <div class="fields">
+        <div><span class="field-k">Carrier</span><span class="field-v">UT Austin</span></div>
+        <div><span class="field-k">GPA</span><span class="field-v">4.00</span></div>
+        <div><span class="field-k">Ratings</span><span class="field-v">PPL (est.), CSWA, PCPP</span></div>
+        <div><span class="field-k">Work eligibility</span><span class="field-v">U.S., no restriction</span></div>
+      </div>
+    </div>
+    <aside class="pass-stub">
+      <span class="field-k">Passenger</span>
+      <span class="field-v">ADAPALA / NIKHIL</span>
+      <div class="stub-links">
+        <a href="mailto:adapalanikhil@gmail.com">adapalanikhil@gmail.com</a>
+        <a href="https://linkedin.com/in/nikhiladapala">linkedin.com/in/nikhiladapala</a>
+        <a href="https://github.com/onedope512">github.com/onedope512</a>
+      </div>
+      <div class="barcode" id="barcode" aria-hidden="true"></div>
+    </aside>
+  </section>
+
+  <section class="section">
+    <h2>Experience</h2>
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-title">The City of Austin, I.T. Division — Software Development Intern</span>
+        <span class="entry-when">Summer 2025</span>
+      </div>
+      <div class="entry-sub">Austin, TX</div>
+      <ul>
+        <li>Architected the React front end for TradeRoots, a full-stack skill-exchange platform for the Austin community.</li>
+        <li>Engineered messaging and reviews using React, Node.js, REST APIs, and SQL for the full trade workflow.</li>
+        <li>Directed a 5-person engineering team through the full build cycle, winning the 2025 Entrepreneurship Award.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-title">HearingTracker — Software Development Intern</span>
+        <span class="entry-when">Spring 2024 – Summer 2025</span>
+      </div>
+      <div class="entry-sub">Remote</div>
+      <ul>
+        <li>Designed a SQL schema managing 500+ hearing aid models across 12 brands with 10+ spec fields each.</li>
+        <li>Built a React/Node.js app serving personalized recommendations to 30,000+ users from 20+ filter criteria.</li>
+        <li>Integrated Phonak and Oticon APIs to pull live device specs and pricing into the recommendation engine.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Projects</h2>
+    <div class="entry">
+      <div class="entry-head"><span class="entry-title">StarForge — Procedural 3D space engine</span><span class="entry-when">Summer 2026</span></div>
+      <ul>
+        <li>Built a procedural 3D space engine, generating full star systems of numerous worlds from one seed.</li>
+        <li>Solved floating-point drift on 47,000-unit planets with dynamic origin recentering every 3,000 units.</li>
+        <li>Architected multithreaded terrain streaming holding ~100K scatter instances in view at any altitude.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="entry-title">Multimodal Deep Learning for Financial Market Prediction</span><span class="entry-when">Summer 2025</span></div>
+      <ul>
+        <li>Led a peer-reviewed study benchmarking six architectures for equity price forecasting.</li>
+        <li>Cut forecast error 34% and doubled R² to 0.68 by fusing market data with FinBERT sentiment signals.</li>
+        <li>Designed a custom hybrid architecture and ran ablations isolating top predictive feature contributors.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="entry-title">5 D.O.F. Robotic Hand</span><span class="entry-when">Summer 2026</span></div>
+      <ul>
+        <li>Designed and 3D-printed a robotic hand, modeling all finger assemblies in SolidWorks.</li>
+        <li>Programmed an Arduino to independently actuate 5 servos via a custom serial protocol.</li>
+        <li>Built two Python pipelines for real-time gesture recognition and speech-driven ASL fingerspelling.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="entry-title">N-Body Orbital Mechanics Simulator</span><span class="entry-when">Summer 2026</span></div>
+      <ul>
+        <li>Built a real-time, 2,400-line N-body gravitational simulator in vanilla JavaScript and Three.js.</li>
+        <li>Implemented a symplectic leapfrog integrator conserving orbital energy indefinitely at 60 FPS.</li>
+        <li>Modeled tidal disruption and momentum-conserving mergers with custom GLSL shaders.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Certificates &amp; honors</h2>
+    <div class="entry">
+      <div class="entry-head"><span class="entry-title">Private Pilot's License (PPL)</span><span class="entry-when">Fall 2026 (estimated)</span></div>
+      <div class="entry-head"><span class="entry-title">Certified SolidWorks Associate (CSWA)</span><span class="entry-when">Summer 2026</span></div>
+      <div class="entry-head"><span class="entry-title">Certified Professional Python Programmer (PCPP)</span><span class="entry-when">Summer 2025</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Skills</h2>
+    <dl class="skills">
+      <dt>Languages</dt><dd>Python, Java, C++, JavaScript, C#, R, SQL, HTML/CSS</dd>
+      <dt>Libraries &amp; frameworks</dt><dd>TensorFlow/Keras, Keras Tuner, scikit-learn, pandas, NumPy, MediaPipe, OpenCV, React.js, Node.js, REST APIs, Google APIs, Firebase, PostgreSQL, MySQL, Airtable</dd>
+      <dt>Applications &amp; tools</dt><dd>SolidWorks, MATLAB, Excel, Arduino IDE, Git, Figma, 3D Printing, Soldering</dd>
+      <dt>Interests</dt><dd>Piloting, basketball, running, sports, programming, mathematics, learning, traveling, geography</dd>
+    </dl>
+  </section>
+</main>
+
+<script>
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+  // decorative barcode built from the passenger name, so it's stable between prints
+  (function(){
+    const el = document.getElementById('barcode');
+    const seed = 'ADAPALA/NIKHIL-AUS-2029';
+    for(let i = 0; i < 46; i++){
+      const c = seed.charCodeAt(i % seed.length) + i * 7;
+      const bar = document.createElement('span');
+      bar.style.width = (1 + c % 3) + 'px';
+      el.appendChild(bar);
+    }
+  })();
+</script>
+</body>
+</html>

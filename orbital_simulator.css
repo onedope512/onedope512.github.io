@@ -1,0 +1,613 @@
+/* =============================================================
+   ORBITAL SIMULATOR 3D — Stylesheet
+   Theme: dark space UI, cyan accent (#0ff), monospace font
+   ============================================================= */
+
+/* ── Reset & Base ──────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+  color: #0ff;
+}
+
+/* ── Left Sidebar Panel ────────────────────────────────────── */
+#ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 275px;
+  height: 100vh;
+  background: rgba(0, 8, 18, .93);
+  border-right: 1px solid #0ff3;
+  padding: 12px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+h1 {
+  font-size: 12px;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid #0ff3;
+}
+
+/* Section blocks inside the sidebar */
+.sec {
+  margin-bottom: 11px;
+}
+
+.sec-title {
+  font-size: 10px;
+  color: #0ffa;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* ── Form Controls ─────────────────────────────────────────── */
+label {
+  font-size: 11px;
+  color: #8cf;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Floating right-side value readout next to a label */
+.val {
+  float: right;
+  color: #0ff;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: #0ff;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+input[type=color] {
+  width: 100%;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+button {
+  background: transparent;
+  border: 1px solid #0ff4;
+  color: #0ff;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+button:hover {
+  background: #0ff2;
+  border-color: #0ff;
+}
+
+button:active {
+  animation: btnRipple 0.3s ease-out;
+  transform: scale(0.97);
+}
+
+/* Active / toggled-on state */
+button.on {
+  background: #0ff3;
+  border-color: #0ff;
+  box-shadow: 0 0 8px #0ff4;
+}
+
+/* Danger / destructive action (red) */
+button.red {
+  border-color: #f004;
+  color: #f77;
+}
+button.red:hover {
+  background: #f002;
+  border-color: #f77;
+}
+
+/* Time-reversal button (amber) */
+button.rev {
+  border-color: #f804;
+  color: #fa0;
+}
+button.rev.on {
+  background: #f803;
+  border-color: #fa0;
+  box-shadow: 0 0 8px #f804;
+}
+
+/* Positive action (green) */
+button.grn {
+  border-color: #0f04;
+  color: #0f8;
+}
+button.grn.on {
+  background: #0f03;
+  border-color: #0f8;
+  box-shadow: 0 0 8px #0f04;
+}
+
+/* Horizontal pair of equal-width buttons */
+.row {
+  display: flex;
+  gap: 4px;
+}
+.row button {
+  flex: 1;
+}
+
+/* ── Status / warning text ─────────────────────────────────── */
+#status {
+  font-size: 10px;
+  color: #ff0;
+  min-height: 16px;
+  margin-top: 4px;
+  transition: color 0.2s;
+}
+
+/* ── Body List ─────────────────────────────────────────────── */
+#body-list {
+  max-height: 130px;
+  overflow-y: auto;
+}
+
+.bitem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  border: 1px solid #fff1;
+  border-radius: 2px;
+  font-size: 10px;
+  animation: bitemIn 0.22s ease both;
+}
+
+.bitem:nth-child(1)  { animation-delay: 0ms;  }
+.bitem:nth-child(2)  { animation-delay: 30ms; }
+.bitem:nth-child(3)  { animation-delay: 60ms; }
+.bitem:nth-child(4)  { animation-delay: 90ms; }
+.bitem:nth-child(5)  { animation-delay: 120ms;}
+.bitem:nth-child(6)  { animation-delay: 150ms;}
+.bitem:nth-child(n+7){ animation-delay: 180ms;}
+
+/* Currently selected body */
+.bitem.sel {
+  border-color: #ff04;
+  background: #ff01;
+}
+
+/* Multi-selected body (cyan tint) */
+.bitem.multi {
+  border-color: #0ff5;
+  background: #0ff1;
+}
+
+/* Multi-select action bar */
+#multiselect-bar {
+  background: #001a22;
+  border: 1px solid #0ff4;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: #0ff;
+}
+
+/* Colour dot representing the body */
+.bdot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bname {
+  cursor: pointer;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bname:hover {
+  color: #ff0;
+  text-decoration: underline dotted;
+}
+
+/* Tiny inline buttons (THR / FOL / DEL) inside each body row */
+.bitem .bb {
+  width: auto;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin: 0;
+}
+.bitem .bb.del { border-color: #f004; color: #f77; }
+.bitem .bb.thr { border-color: #fa04; color: #fa0; }
+.bitem .bb.fol { border-color: #0f04; color: #0f8; }
+
+/* ── Thrust Panel ──────────────────────────────────────────── */
+#thrust-panel {
+  background: #1a0800;
+  border: 1px solid #fa04;
+  border-radius: 3px;
+  padding: 7px;
+  margin-bottom: 8px;
+  display: none;
+}
+
+#thrust-panel .tpn {
+  font-size: 11px;
+  color: #fa0;
+  margin-bottom: 5px;
+}
+
+#thrust-keys {
+  font-size: 10px;
+  color: #fc8;
+  line-height: 1.8;
+}
+
+/* ── Recorder Panel ────────────────────────────────────────── */
+#rec-panel {
+  background: #001a00;
+  border: 1px solid #0f04;
+  border-radius: 3px;
+  padding: 7px;
+  margin-top: 6px;
+  display: none;
+}
+
+#rec-panel .rpn {
+  font-size: 10px;
+  color: #0f8;
+  margin-bottom: 5px;
+}
+
+#pbSlider {
+  width: 100%;
+  accent-color: #0f8;
+  margin: 4px 0;
+}
+
+/* ── Top Bar ───────────────────────────────────────────────── */
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 275px;
+  right: 0;
+  height: 44px;
+  background: rgba(0, 8, 18, .93);
+  border-bottom: 1px solid #0ff3;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+  z-index: 10;
+}
+
+#topbar button {
+  width: auto;
+  margin: 0;
+  padding: 4px 12px;
+  font-size: 11px;
+}
+
+#simtime {
+  font-size: 11px;
+  color: #0ffa;
+}
+
+#hint {
+  font-size: 10px;
+  color: #fff3;
+  margin-left: auto;
+}
+
+/* ── Hover Tooltip ─────────────────────────────────────────── */
+#hover-tip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 20;
+  background: rgba(0, 8, 18, .93);
+  border: 1px solid #0ff5;
+  padding: 5px 10px;
+  font-size: 11px;
+  line-height: 1.7;
+  display: none;
+  white-space: nowrap;
+}
+#hover-tip .hn { color: #fff; font-size: 12px; font-weight: bold; }
+#hover-tip .ht { color: #0ffa; font-size: 10px; }
+#hover-tip .hv { color: #8cf; font-size: 10px; }
+
+/* ── Body Preset Tile Grid ─────────────────────────────────── */
+#presetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-bottom: 8px;
+}
+
+.ptile {
+  background: #0a1a2a;
+  border: 1px solid #0ff3;
+  border-radius: 3px;
+  padding: 4px 2px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 9px;
+  color: #8cf;
+  transition: background .15s, border-color .15s;
+}
+.ptile:hover  { background: #0d2233; border-color: #0ff9; }
+.ptile.sel    { background: #002233; border-color: #0ff; color: #fff; }
+.ptile .pe    { font-size: 14px; display: block; line-height: 1.4; }
+.ptile .pn    { display: block; font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Stats Overlay (bottom-right) ──────────────────────────── */
+#overlay {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+  color: #fff4;
+  text-align: right;
+  line-height: 1.8;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ── Persistent World-Space Labels (Origin / CoM) ─────────── */
+.world-label {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #ffffff88;
+  text-shadow: 0 0 6px #000, 0 0 12px #000;
+  transform: translate(-50%, -180%);
+  white-space: nowrap;
+}
+
+#label-com {
+  color: #0ff9;
+}
+
+/* ── Floating Body Labels ──────────────────────────────────── */
+#labels {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.blabel {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 4px #000, 0 0 8px #000;
+  white-space: nowrap;
+}
+
+/* =============================================================
+   ANIMATIONS
+   ============================================================= */
+
+@keyframes tutOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes tutBoxIn {
+  from { opacity: 0; transform: scale(0.88) translateY(28px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+@keyframes tabPageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes bitemIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes statusPop {
+  0%   { transform: scale(1);    color: #ff0; }
+  40%  { transform: scale(1.06); color: #fff; }
+  100% { transform: scale(1);    color: #ff0; }
+}
+
+@keyframes btnRipple {
+  from { box-shadow: 0 0 0 0 #0ff5; }
+  to   { box-shadow: 0 0 0 10px #0ff0; }
+}
+
+/* =============================================================
+   TUTORIAL MODAL
+   ============================================================= */
+
+/* Semi-transparent backdrop */
+#tut-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .82);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tutOverlayIn 0.35s ease both;
+}
+
+/* Modal box */
+#tut-box {
+  background: #000d1a;
+  border: 1px solid #0ff6;
+  border-radius: 6px;
+  width: 700px;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 40px #0ff2;
+  animation: tutBoxIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#tut-header {
+  padding: 16px 20px 10px;
+  border-bottom: 1px solid #0ff2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#tut-header h2 {
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #0ff;
+}
+
+/* Tab strip */
+#tut-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px 0;
+  border-bottom: 1px solid #0ff2;
+}
+
+.ttab {
+  background: transparent;
+  border: 1px solid #0ff3;
+  border-bottom: none;
+  color: #0ff8;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 3px 3px 0 0;
+  transition: background .15s;
+}
+.ttab:hover { background: #0ff1; }
+.ttab.on    { background: #0ff2; border-color: #0ff; color: #fff; }
+
+/* Scrollable content area */
+#tut-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.tpage {
+  animation: tabPageIn 0.25s ease both;
+}
+
+#tut-body h3 {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #0ff;
+  text-transform: uppercase;
+  margin: 14px 0 7px;
+  border-bottom: 1px solid #0ff2;
+  padding-bottom: 4px;
+}
+#tut-body h3:first-child { margin-top: 0; }
+
+#tut-body p {
+  font-size: 11px;
+  color: #8cf;
+  line-height: 1.75;
+  margin-bottom: 6px;
+}
+
+/* Keyboard shortcut chips row */
+#tut-body .krow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+#tut-body .kb {
+  display: inline-block;
+  background: #0a1a2a;
+  border: 1px solid #0ff5;
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: 10px;
+  color: #fff;
+  white-space: nowrap;
+}
+#tut-body .kb span {
+  color: #0ffa;
+  font-size: 9px;
+  margin-left: 5px;
+}
+
+/* Reference tables */
+#tut-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+#tut-body td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #0ff1;
+  color: #8cf;
+  vertical-align: top;
+}
+#tut-body td:first-child {
+  color: #0ff;
+  white-space: nowrap;
+  width: 120px;
+}
+
+/* Footer with action buttons */
+#tut-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #0ff2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+#tut-footer button {
+  background: transparent;
+  border: 1px solid #0ff4;
+  color: #0ff;
+  padding: 6px 18px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+#tut-footer button:hover        { background: #0ff2; border-color: #0ff; }
+#tut-footer button.pri          { border-color: #0ff; background: #0ff2; color: #fff; }
+#tut-footer button.pri:hover    { background: #0ff4; }
